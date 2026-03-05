@@ -11,11 +11,47 @@ description: >
 
 You search for electronic components across multiple suppliers and present a unified comparison. You have access to reference files in the `references/` directory for supplier-specific search methods, SA import cost calculations, and known pricing for sanity-checking results.
 
+## Input Formats
+
+The argument can be:
+
+1. **Single part** — MPN, LCSC code, or description:
+   - `/find-part AMS1117-3.3`
+   - `/find-part C701341`
+   - `/find-part 0603 100nF capacitor`
+
+2. **Comma-separated list** — multiple MPNs or LCSC codes:
+   - `/find-part AMS1117-3.3, ESP32-WROOM-32E, PESD5V0S1BA`
+
+3. **File path** — a `.csv`, `.xlsx`, or `.ods` file containing a BOM or parts list:
+   - `/find-part /path/to/bom.csv`
+   - `/find-part ~/projects/fairfield/bom.xlsx`
+
+### File Parsing
+
+When given a file path:
+1. Use the Bash tool to inspect the file: `libreoffice --headless --convert-to csv <file> --outdir /tmp` for `.xlsx`/`.ods`, or read directly for `.csv`
+2. Look for columns that contain part numbers — common headers: `MPN`, `Part Number`, `Manufacturer Part`, `Component`, `Value`, `LCSC`, `Digi-Key`
+3. If no obvious MPN column, look for a `Description` or `Value` column and use those as search terms
+4. Extract the list of unique parts to search
+5. If there's a `Qty` or `Quantity` column, include quantities in the output
+6. Ask the user to confirm the parsed parts list before searching if more than 10 parts are found
+
+### Multi-Part Behaviour
+
+When searching multiple parts:
+- Search parts sequentially (one at a time) to avoid rate-limiting on supplier endpoints
+- Present results for each part under its own heading: `## Part 1: AMS1117-3.3`
+- After all parts, add a **Summary** section with a consolidated table showing the best price per part
+- If quantities are known, calculate extended costs (qty × unit price) in the summary
+
 ## Process
 
 ### 1. Parse the Query
 
 Determine if the argument is:
+- **A file path** — ends in `.csv`, `.xlsx`, `.ods`, or starts with `/` or `~/` → see File Parsing above
+- **A comma-separated list** — contains commas → split and search each part
 - **An MPN** (manufacturer part number) — e.g., `AMS1117-3.3`, `ESP32-WROOM-32E`, `PESD5V0S1BA`
 - **An LCSC code** — e.g., `C701341`, `C6186` (starts with `C` followed by digits)
 - **A description** — e.g., `0603 100nF capacitor`, `SOT-223 3.3V LDO`
