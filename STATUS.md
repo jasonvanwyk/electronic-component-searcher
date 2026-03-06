@@ -1,28 +1,30 @@
 # Status — Electronic Component Searcher
 
-## Current Phase: Initial Development
+## Current Phase: Initial Development — M1 Complete
 
 ## Milestones
 
-### M1: `/find-part` skill — In Progress
+### M1: `/find-part` skill — Complete
 - [x] ~~Project scaffold (git, directories, .gitignore)~~
 - [x] ~~Reference files (suppliers, import costs, known pricing)~~
 - [x] ~~SKILL.md for /find-part~~
 - [x] ~~Install script~~
 - [x] ~~Smoke-test with AMS1117-3.3~~
 - [x] ~~Fix Octopart 403 issue (use search snippets only)~~
-- [ ] Smoke-test with description query (e.g. `0603 100nF capacitor`)
-- [ ] Initial git commit
+- [x] ~~Add multi-part and file input support~~
+- [x] ~~Full BOM test with Fairfield Dairy vendor order (38 items)~~
 
-### Smoke-Test Results (AMS1117-3.3)
-- Communica Shopify JSON: works, returned modules only (no bare IC — expected)
-- Mantech via site: search + WebFetch: works, pricing extracted correctly
-- Octopart: 403 on WebFetch — updated SKILL.md to use search snippets only
-- LCSC via WebFetch: works, pricing and stock extracted correctly
-- Sanity check against known pricing: all values match
+### Full BOM Test Results (6 March 2026)
+- Searched all 38 line items across Communica, Mantech, Octopart, LCSC
+- Communica Shopify JSON: works for passives, no results for specialty items
+- Mantech site-search + WebFetch: reliable pricing extraction
+- LCSC WebFetch: consistent, good pricing data
+- Octopart: 403 on WebFetch, search snippets provide links but limited pricing
+- Identified 6 warnings: wrong products quoted, package mismatches, uncommon variants
+- Produced optimal supplier split recommendation (Communica/Mantech/LCSC/AliExpress)
 
 ### M2: Future skills (not started)
-- [ ] `/price-bom` — automated BOM pricing
+- [ ] `/price-bom` — full BOM pricing with per-board cost rollups and extended pricing
 - [ ] `/landed-cost` — SA import cost calculator
 - [ ] `/check-stock` — real-time stock check
 - [ ] `/procurement-split` — optimal supplier allocation
